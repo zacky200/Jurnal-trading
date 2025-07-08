@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jurnal Trading Forex</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4f8;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    form, table {
+      max-width: 600px;
+      margin: auto;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 8px;
+      margin-bottom: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      background-color: #0d6efd;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0b5ed7;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 30px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background-color: #0d6efd;
+      color: white;
+    }
+    tfoot td {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Jurnal Trading Forex</h1>
+
+  <form id="jurnalForm">
+    <input type="date" id="tanggal" required />
+    <input type="text" id="pair" placeholder="Contoh: EUR/USD" required />
+    <select id="posisi" required>
+      <option value="">Pilih Posisi</option>
+      <option value="Buy">Buy</option>
+      <option value="Sell">Sell</option>
+    </select>
+    <input type="number" id="lot" placeholder="Lot" required step="0.01" />
+    <input type="number" id="hasil" placeholder="Profit / Loss (dalam USD)" required step="0.01" />
+    <textarea id="catatan" placeholder="Catatan tambahan..."></textarea>
+    <button type="submit">Tambah Entry</button>
+  </form>
+
+  <table id="jurnalTable">
+    <thead>
+      <tr>
+        <th>Tanggal</th>
+        <th>Pair</th>
+        <th>Posisi</th>
+        <th>Lot</th>
+        <th>Hasil ($)</th>
+        <th>Catatan</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+    <tfoot>
+      <tr>
+        <td colspan="4">Total</td>
+        <td id="totalHasil">$0.00</td>
+        <td></td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <script>
+    const form = document.getElementById("jurnalForm");
+    const tableBody = document.querySelector("#jurnalTable tbody");
+    const totalHasil = document.getElementById("totalHasil");
+
+    let data = JSON.parse(localStorage.getItem("jurnalForex")) || [];
+
+    function updateTable() {
+      tableBody.innerHTML = "";
+      let total = 0;
+
+      data.forEach((entry) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${entry.tanggal}</td>
+          <td>${entry.pair}</td>
+          <td>${entry.posisi}</td>
+          <td>${entry.lot}</td>
+          <td>${parseFloat(entry.hasil).toFixed(2)}</td>
+          <td>${entry.catatan}</td>
+        `;
+        total += parseFloat(entry.hasil);
+        tableBody.appendChild(row);
+      });
+
+      totalHasil.textContent = `$${total.toFixed(2)}`;
+      localStorage.setItem("jurnalForex", JSON.stringify(data));
+    }
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const entry = {
+        tanggal: document.getElementById("tanggal").value,
+        pair: document.getElementById("pair").value,
+        posisi: document.getElementById("posisi").value,
+        lot: document.getElementById("lot").value,
+        hasil: document.getElementById("hasil").value,
+        catatan: document.getElementById("catatan").value,
+      };
+      data.push(entry);
+      form.reset();
+      updateTable();
+    });
+
+    updateTable();
+  </script>
+</body>
+</html>

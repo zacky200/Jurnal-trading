@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Forex Trading Journal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        .page-animation {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .trading-card {
+            transition: all 0.3s ease;
+        }
+        .trading-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors duration-300">
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-blue-600 dark:text-blue-400">Forex Trading Journal</h1>
+                <p class="text-gray-600 dark:text-gray-400">Professional trading performance tracker</p>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button id="theme-toggle" class="p-2 rounded-md bg-gray-200 dark:bg-gray-700">
+                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/107d655b-01ae-46ae-b950-6db76de3c3b7.png" alt="Theme toggle icon showing sun and moon for light/dark mode" class="h-6 w-6" />
+                </button>
+                <label for="profile-upload" class="cursor-pointer">
+    <img id="profile-pic" src="https://via.placeholder.com/100" alt="Profile" class="h-10 w-10 rounded-full border-2 border-blue-500 object-cover" />
+    <input type="file" id="profile-upload" accept="image/*" class="hidden" />
+</label>
+            </div>
+        </header>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 trading-card">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Total Trades</p>
+                        <h3 id="total-trades" class="text-2xl font-semibold">0</h3>
+                    </div>
+                    <div class="p-3 rounded-full bg-blue-100 dark:bg-blue-900/30">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/8a2e956c-45fe-4ae2-9b48-db0086718ba2.png" alt="Trade count icon showing stacked coins" class="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 trading-card">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Win Rate</p>
+                        <h3 id="win-rate" class="text-2xl font-semibold">0%</h3>
+                    </div>
+                    <div class="p-3 rounded-full bg-green-100 dark:bg-green-900/30">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/fb135483-dd86-4ce1-a346-9edbd6764fac.png" alt="Win rate icon showing rising chart" class="h-6 w-6 text-green-600 dark:text-green-400" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 trading-card">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Avg Profit</p>
+                        <h3 id="avg-profit" class="text-2xl font-semibold">$0.00</h3>
+                    </div>
+                    <div class="p-3 rounded-full bg-purple-100 dark:bg-purple-900/30">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/fa743186-d52d-4173-8a35-78e9a37f99e6.png" alt="Average profit icon showing upward arrow with dollar sign" class="h-6 w-6 text-purple-600 dark:text-purple-400" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 trading-card">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Avg Loss</p>
+                        <h3 id="avg-loss" class="text-2xl font-semibold">$0.00</h3>
+                    </div>
+                    <div class="p-3 rounded-full bg-red-100 dark:bg-red-900/30">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/651ecc24-8085-4770-976a-a5bb6bc20b81.png" alt="Average loss icon showing downward arrow with dollar sign" class="h-6 w-6 text-red-600 dark:text-red-400" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Add Trade Form -->
+            <div class="lg:col-span-1 bg-white dark:bg-gray-800 rounded-lg shadow p-6 page-animation">
+                <h2 class="text-xl font-semibold mb-4">Add New Trade</h2>
+                <form id="trade-form">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Currency Pair</label>
+                            <select id="currency-pair" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600">
+                                <option value="EUR/USD">EUR/USD</option>
+                                <option value="GBP/USD">GBP/USD</option>
+                                <option value="USD/JPY">USD/JPY</option>
+                                <option value="AUD/USD">AUD/USD</option>
+                                <option value="USD/CAD">USD/CAD</option>
+                                <option value="NZD/USD">NZD/USD</option>
+                                <option value="XAU/USD">XAU/USD</option>
+                            </select>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Direction</label>
+                                <select id="direction" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600">
+                                    <option value="BUY">BUY</option>
+                                    <option value="SELL">SELL</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Position Size (lots)</label>
+                                <input id="position-size" type="number" step="0.01" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600" />
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Entry Price</label>
+                                <input id="entry-price" type="number" step="0.00001" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Entry Date</label>
+                                <input id="entry-date" type="datetime-local" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600" />
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Stop Loss</label>
+                                <input id="stop-loss" type="number" step="0.00001" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Take Profit</label>
+                                <input id="take-profit" type="number" step="0.00001" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600" />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Reason (Technical/Fundamental)</label>
+                            <textarea id="reason" rows="3" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"></textarea>
+                        </div>
+
+                        <div class="hidden closed-trade" id="close-trade-fields">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Exit Price</label>
+                                    <input id="exit-price" type="number" step="0.00001" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Exit Date</label>
+                                    <input id="exit-date" type="datetime-local" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600" />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Post-Trade Analysis</label>
+                                <textarea id="analysis" rows="3" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="flex space-x-2">
+                            <button type="button" id="toggle-close-btn" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-md text-sm font-medium">
+                                Add Exit Details
+                            </button>
+                            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 transition">
+                                Save Trade
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Trade History -->
+            <div class="lg:col-span-2 space-y-6">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 page-animation">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-semibold">Trade History</h2>
+                        <div class="flex space-x-2">
+                            <button id="export-excel" class="px-3 py-1 bg-green-600 text-white rounded-md text-xs font-medium hover:bg-green-700 transition">
+                                Export Excel
+                            </button>
+                            <button id="export-pdf" class="px-3 py-1 bg-red-600 text-white rounded-md text-xs font-medium hover:bg-red-700 transition">
+                                Export PDF
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table id="trade-table" class="w-full border-collapse">
+                            <thead>
+                                <tr class="bg-gray-100 dark:bg-gray-700">
+                                    <th class="p-2 text-left text-sm">Date</th>
+                                    <th class="p-2 text-left text-sm">Pair</th>
+                                    <th class="p-2 text-left text-sm">Direction</th>
+                                    <th class="p-2 text-left text-sm">Size</th>
+                                    <th class="p-2 text-left text-sm">Entry</th>
+                                    <th class="p-2 text-left text-sm">Exit</th>
+                                    <th class="p-2 text-left text-sm">P/L</th>
+                                    <th class="p-2 text-left text-sm">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="trade-table-body">
+                                <!-- Trade entries will be added here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Performance Chart -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 page-animation">
+                    <h2 class="text-xl font-semibold mb-4">Performance Chart</h2>
+                    <div class="h-64">
+                        <canvas id="performance-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize variables
+        let trades = JSON.parse(localStorage.getItem('forexTrades')) || [];
+        let chart = null;
+        const { jsPDF } = window.jspdf;
+
+        // DOM Elements
+        const tradeForm = document.getElementById('trade-form');
+        const toggleCloseBtn = document.getElementById('toggle-close-btn');
+        const closeTradeFields = document.getElementById('close-trade-fields');
+        const tradeTableBody = document.getElementById('trade-table-body');
+        const exportExcelBtn = document.getElementById('export-excel');
+        const exportPdfBtn = document.getElementById('export-pdf');
+        const themeToggle = document.getElementById('theme-toggle');
+        const performanceCtx = document.getElementById('performance-chart').getContext('2d');
+
+        // Stats elements
+        const totalTradesEl = document.getElementById('total-trades');
+        const winRateEl = document.getElementById('win-rate');
+        const avgProfitEl = document.getElementById('avg-profit');
+        const avgLossEl = document.getElementById('avg-loss');
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set current date and time as default
+            const now = new Date();
+            document.getElementById('entry-date').valueAsDate = now;
+            
+            // Load trades and render
+            loadTrades();
+            updateStats();
+            renderPerformanceChart();
+            
+            // Initialize theme
+            if (localStorage.getItem('theme') === 'dark' || 
+                (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            }
+        });
+
+        // Theme toggle
+        themeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+        });
+
+        // Toggle close trade fields
+        toggleCloseBtn.addEventListener('click', () => {
+            closeTradeFields.classList.toggle('hidden');
+            toggleCloseBtn.textContent = closeTradeFields.classList.contains('hidden') 
+                ? 'Add Exit Details' 
+                : 'Hide Exit Details';
+        });
+
+        // Save trade
+        tradeForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const trade = {
+                pair: document.getElementById('currency-pair').value,
+                direction: document.getElementById('direction').value,
+                positionSize: parseFloat(document.getElementById('position-size').value),
+                entryPrice: parseFloat(document.getElementById('entry-price').value),
+                entryDate: document.getElementById('entry-date').value,
+                stopLoss: parseFloat(document.getElementById('stop-loss').value),
+                takeProfit: parseFloat(document.getElementById('take-profit').value),
+                reason: document.getElementById('reason').value,
+                exitPrice: document.getElementById('exit-price').value ? parseFloat(document.getElementById('exit-price').value) : null,
+                exitDate: document.getElementById('exit-date').value || null,
+                analysis: document.getElementById('analysis').value || null
+            };
+            
+            trades.push(trade);
+            saveTrades();
+            
+            // Reset form
+            tradeForm.reset();
+            document.getElementById('entry-date').valueAsDate = new Date();
+            closeTradeFields.classList.add('hidden');
+            toggleCloseBtn.textContent = 'Add Exit Details';
+            
+            // Update UI
+            loadTrades();
+            updateStats();
+            renderPerformanceChart();
+        });
+
+        // Load trades into table
+        function loadTrades() {
+            tradeTableBody.innerHTML = '';
+            
+            trades.forEach((trade, index) => {
+                const row = document.createElement('tr');
+                row.className = 'border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50';
+                
+                // Calculate P/L
+                let pips = 0;
+                let profitLoss = 0;
+                let pipsText = '-';
+                let profitLossText = '-';
+                let profitClass = '';
+                
+                if (trade.exitPrice) {
+                    pips = trade.direction === 'BUY' 
+                        ? (trade.exitPrice - trade.entryPrice) * 10000 
+                        : (trade.entryPrice - trade.exitPrice) * 10000;
+                    
+                    // Approximate profit calculation (simplified)
+                    const pipValue = 10; // Approximate pip value for standard lots
+                    profitLoss = (pips * pipValue * trade.positionSize).toFixed(2);
+                    pipsText = pips.toFixed(1) + ' pips';
+                    profitLossText = '$' + profitLoss;
+                    
+                    profitClass = profitLoss >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400';
+                }
+                
+                row.innerHTML = `
+                    <td class="p-2 text-sm">${formatDate(trade.entryDate)}</td>
+                    <td class="p-2 text-sm font-medium">${trade.pair}</td>
+                    <td class="p-2 text-sm">
+                        <span class="${trade.direction === 'BUY' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}">
+                            ${trade.direction}
+                        </span>
+                    </td>
+                    <td class="p-2 text-sm">${trade.positionSize} lots</td>
+                    <td class="p-2 text-sm">${trade.entryPrice.toFixed(5)}</td>
+                    <td class="p-2 text-sm">${trade.exitPrice ? trade.exitPrice.toFixed(5) : '-'}</td>
+                    <td class="p-2 text-sm ${profitClass} font-medium">${profitLossText}</td>
+                    <td class="p-2 text-sm">
+                        <button onclick="deleteTrade(${index})" class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300">
+                            Delete
+                        </button>
+                        ${trade.exitPrice ? '' : `<button onclick="closeTrade(${index})" class="ml-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
+                            Close
+                        </button>`}
+                    </td>
+                `;
+                
+                tradeTableBody.appendChild(row);
+            });
+        }
+
+        // Delete trade
+        window.deleteTrade = function(index) {
+            if (confirm('Are you sure you want to delete this trade?')) {
+                trades.splice(index, 1);
+                saveTrades();
+                loadTrades();
+                updateStats();
+                renderPerformanceChart();
+            }
+        };
+
+        // Close trade
+        window.closeTrade = function(index) {
+            const exitPrice = prompt('Enter exit price:');
+            if (!exitPrice || isNaN(exitPrice)) return;
+            
+            trades[index].exitPrice = parseFloat(exitPrice);
+            trades[index].exitDate = new Date().toISOString().slice(0, 16);
+            
+            const analysis = prompt('Enter post-trade analysis:');
+            if (analysis) {
+                trades[index].analysis = analysis;
+            }
+            
+            saveTrades();
+            loadTrades();
+            updateStats();
+            renderPerformanceChart();
+        };
+
+        // Save trades to localStorage
+        function saveTrades() {
+            localStorage.setItem('forexTrades', JSON.stringify(trades));
+        }
+
+        // Update stats
+        function updateStats() {
+            const closedTrades = trades.filter(t => t.exitPrice);
+            const profitableTrades = closedTrades.filter(t => {
+                const pips = t.direction === 'BUY' 
+                    ? (t.exitPrice - t.entryPrice) * 10000 
+                    : (t.entryPrice - t.exitPrice) * 10000;
+                return pips > 0;
+            });
+            
+            totalTradesEl.textContent = trades.length;
+            winRateEl.textContent = closedTrades.length > 0 
+                ? Math.round((profitableTrades.length / closedTrades.length) * 100) + '%' 
+                : '0%';
+                
+            // Calculate average profit/loss
+            if (closedTrades.length > 0) {
+                const profits = closedTrades.map(t => {
+                    const pips = t.direction === 'BUY' 
+                        ? (t.exitPrice - t.entryPrice) * 10000 
+                        : (t.entryPrice - t.exitPrice) * 10000;
+                    return pips * 10 * t.positionSize; // Approximate $ value
+                });
+                
+                const avgProfit = profits.filter(p => p > 0).reduce((a, b) => a + b, 0) / (profitableTrades.length || 1);
+                const avgLoss = profits.filter(p => p < 0).reduce((a, b) => a + b, 0) / ((closedTrades.length - profitableTrades.length) || 1);
+                
+                avgProfitEl.textContent = '$' + avgProfit.toFixed(2);
+                avgLossEl.textContent = '$' + Math.abs(avgLoss).toFixed(2);
+            } else {
+                avgProfitEl.textContent = '$0.00';
+                avgLossEl.textContent = '$0.00';
+            }
+        }
+
+        // Render performance chart
+        function renderPerformanceChart() {
+            if (chart) {
+                chart.destroy();
+            }
+            
+            // Prepare data for chart
+            const closedTrades = trades.filter(t => t.exitPrice).sort((a, b) => new Date(a.exitDate) - new Date(b.exitDate));
+            let balance = 10000; // Starting balance
+            const balanceData = [balance];
+            const labels = ['Start'];
+            
+            closedTrades.forEach(trade => {
+                const pips = trade.direction === 'BUY' 
+                    ? (trade.exitPrice - trade.entryPrice) * 10000 
+                    : (trade.entryPrice - trade.exitPrice) * 10000;
+                
+                const profitLoss = pips * 10 * trade.positionSize; // Approximate $ value
+                balance += profitLoss;
+                
+                balanceData.push(balance);
+                labels.push(formatDate(trade.exitDate));
+            });
+            
+            // Create chart
+            chart = new Chart(performanceCtx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Account Balance',
+                        data: balanceData,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Balance: $' + context.parsed.y.toFixed(2);
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toFixed(2);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Export to Excel
+        exportExcelBtn.addEventListener('click', () => {
+            const wb = XLSX.utils.book_new();
+            
+            // Prepare data for export
+            const exportData = trades.map(trade => {
+                let pips = 0;
+                let profitLoss = 0;
+                
+                if (trade.exitPrice) {
+                    pips = trade.direction === 'BUY' 
+                        ? (trade.exitPrice - trade.entryPrice) * 10000 
+                        : (t.entryPrice - t.exitPrice) * 10000;
+                    
+                    profitLoss = pips * 10 * trade.positionSize;
+                }
+                
+                return {
+                    'Entry Date': formatDate(trade.entryDate),
+                    'Exit Date': trade.exitDate ? formatDate(trade.exitDate) : '-',
+                    'Currency Pair': trade.pair,
+                    'Direction': trade.direction,
+                    'Position Size (lots)': trade.positionSize,
+                    'Entry Price': trade.entryPrice,
+                    'Stop Loss': trade.stopLoss,
+                    'Take Profit': trade.takeProfit,
+                    'Exit Price': trade.exitPrice || '-',
+                    'Pips': trade.exitPrice ? pips.toFixed(1) : '-',
+                    'Profit/Loss ($)': trade.exitPrice ? profitLoss.toFixed(2) : '-',
+                    'Reason': trade.reason,
+                    'Analysis': trade.analysis || '-'
+                };
+            });
+            
+            const ws = XLSX.utils.json_to_sheet(exportData);
+            XLSX.utils.book_append_sheet(wb, ws, 'Trading Journal');
+            XLSX.writeFile(wb, 'Forex_Trading_Journal.xlsx');
+        });
+
+        // Export to PDF
+        exportPdfBtn.addEventListener('click', () => {
+            const doc = new jsPDF();
+            
+            // Add title
+            doc.setFontSize(20);
+            doc.setTextColor(40);
+            doc.text('Forex Trading Journal', 105, 15, { align: 'center' });
+            
+            // Add date
+            doc.setFontSize(10);
+            doc.text('Generated: ' + new Date().toLocaleString(), 105, 22, { align: 'center' });
+            
+            // Add stats
+            doc.setFontSize(12);
+            doc.text(`Total Trades: ${trades.length}`, 20, 35);
+            doc.text(`Win Rate: ${winRateEl.textContent}`, 20, 45);
+            doc.text(`Avg Profit: ${avgProfitEl.textContent}`, 20, 55);
+            doc.text(`Avg Loss: ${avgLossEl.textContent}`, 20, 65);
+            
+            // Add table
+            const tableData = trades.map(trade => {
+                let pips = 0;
+                let profitLoss = 0;
+                
+                if (trade.exitPrice) {
+                    pips = trade.direction === 'BUY' 
+                        ? (trade.exitPrice - trade.entryPrice) * 10000 
+                        : (trade.entryPrice - trade.exitPrice) * 10000;
+                    
+                    profitLoss = pips * 10 * trade.positionSize;
+                }
+                
+                return [
+                    formatDate(trade.entryDate),
+                    trade.pair,
+                    trade.direction,
+                    trade.positionSize,
+                    trade.entryPrice.toFixed(5),
+                    trade.exitPrice ? trade.exitPrice.toFixed(5) : '-',
+                    trade.exitPrice ? profitLoss.toFixed(2) : '-',
+                    trade.exitPrice ? pips.toFixed(1) : '-'
+                ];
+            });
+            
+            doc.autoTable({
+                startY: 75,
+                head: [['Date', 'Pair', 'Dir', 'Size', 'Entry', 'Exit', 'P/L ($)', 'Pips']],
+                body: tableData,
+                styles: { fontSize: 8 },
+                columnStyles: {
+                    0: { cellWidth: 22 },
+                    1: { cellWidth: 15 },
+                    2: { cellWidth: 10 },
+                    3: { cellWidth: 12 },
+                    4: { cellWidth: 18 },
+                    5: { cellWidth: 18 },
+                    6: { cellWidth: 15 },
+                    7: { cellWidth: 12 }
+                },
+                headStyles: {
+                    fillColor: [59, 130, 246],
+                    textColor: 255
+                }
+            });
+            
+            // Save the PDF
+            doc.save('Forex_Trading_Journal.pdf');
+        });
+
+        // Helper function to format date
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString().slice(0, 5);
+        }
+    
+// Profile upload logic
+const profileUpload = document.getElementById("profile-upload");
+const profilePic = document.getElementById("profile-pic");
+
+if (profileUpload && profilePic) {
+    profileUpload.addEventListener("change", (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                profilePic.src = e.target.result;
+                localStorage.setItem("userProfilePic", e.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const savedPic = localStorage.getItem("userProfilePic");
+        if (savedPic) {
+            profilePic.src = savedPic;
+        }
+    });
+}
+</script>
+</body>
+</html>
+

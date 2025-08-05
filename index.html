@@ -305,6 +305,16 @@
                 exitDate: document.getElementById('exit-date').value || null,
                 analysis: document.getElementById('analysis').value || null
             };
+            // Validasi data sebelum menyimpan
+if (
+    isNaN(trade.positionSize) ||
+    isNaN(trade.entryPrice) ||
+    !trade.entryDate
+) {
+    alert("Harap isi Position Size, Entry Price, dan Entry Date dengan benar!");
+    return;
+                }
+        
             
             trades.push(trade);
             saveTrades();
